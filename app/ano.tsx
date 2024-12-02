@@ -1,11 +1,19 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, FlatList } from "react-native";
 import { useBibliografia } from "../hooks/useBibliografia";
 import { Book } from "../types/bibliografiaTypes";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 
-export default function ListaScreen() {
+export default function AnoScreen() {
   const { books } = useBibliografia();
-  const router = useRouter(); // Para navegação
+  const { year } = useLocalSearchParams();
+
+  // Filtrar livros pelo ano e remover duplicatas
+  const booksByYear = books
+    .filter((book) => book.year === parseInt(year as string, 10)) // Filtrar pelo ano
+    .filter(
+      (book, index, self) =>
+        index === self.findIndex((b) => JSON.stringify(b) === JSON.stringify(book))
+    ); // Remover duplicatas
 
   const renderBook = ({ item }: { item: Book }) => (
     <View style={styles.bookContainer}>
@@ -13,60 +21,46 @@ export default function ListaScreen() {
       <Text>{item.course}</Text>
       <Text>{item.author}</Text>
       <Text>{item.publisher}</Text>
-      <TouchableOpacity onPress={() => router.push(`/ano?year=${item.year}`)}>
-        {/* Navegar para a página de livros por ano */}
-        <Text style={styles.Link}>{item.year}</Text>
-      </TouchableOpacity>
+      <Text>{item.year}</Text>
     </View>
   );
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Livros de {year}</Text>
       <FlatList
-        data={books}
+        data={booksByYear}
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderBook}
-        contentContainerStyle={styles.list}
       />
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "lightgray",
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 20,
-    textAlign: "center",
-  },
-  list: {
-    paddingBottom: 20,
   },
   bookContainer: {
-    backgroundColor: "#fff",
+    marginBottom: 20,
     padding: 15,
-    marginBottom: 10,
-    borderRadius: 5,
+    backgroundColor: "#fff",
+    borderRadius: 8,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 8,
+    elevation: 5,
   },
   bookTitle: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 5,
   },
-  Link:{
-    fontSize: 16,
-    color: "#007BFF",
-    marginTop: 5,
-  }
 });

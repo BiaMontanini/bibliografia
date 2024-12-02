@@ -31,6 +31,7 @@ export default function RootLayout() {
       <Stack>
       <Stack.Screen name="index" options={{ title: 'Buscas' }} />
       <Stack.Screen name="lista" options={{ title: 'Lista de Livros' }} />
+      <Stack.Screen name="ano" options={{ title: 'Livros por ano' }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
